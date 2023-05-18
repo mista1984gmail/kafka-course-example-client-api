@@ -1,0 +1,9 @@
+server:
+  port: 8080
+
+topic:
+  create-client: create.client
+  create-client-scheduler: create.client.scheduler
+
+scheduler:
+  client-creation-period: 30000
