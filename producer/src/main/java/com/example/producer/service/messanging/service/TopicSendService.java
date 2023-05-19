@@ -1,6 +1,5 @@
 package com.example.producer.service.messanging.service;
 
-import com.example.producer.domain.Client;
 import com.example.producer.service.messanging.event.ClientEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,10 +17,10 @@ public class TopicSendService {
     @Autowired
     private KafkaTemplate<String , Object> kafkaTemplate;
 
-    public void clientCreatedFromUI(Client client) {
-        this.kafkaTemplate.send(topicCreateClient, client);
+    public void clientCreatedFromUI(ClientEvent clientEvent) {
+        this.kafkaTemplate.send(topicCreateClient, clientEvent);
     }
-    public void clientCreatedFromScheduler(Client client) {
-        this.kafkaTemplate.send(topicCreateClientScheduler, client);
+    public void clientCreatedFromScheduler(ClientEvent clientEvent) {
+        this.kafkaTemplate.send(topicCreateClientScheduler, clientEvent);
     }
 }

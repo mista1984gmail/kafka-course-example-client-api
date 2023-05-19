@@ -2,14 +2,11 @@ package com.example.producer.service.producer;
 
 import com.example.producer.domain.Client;
 import com.example.producer.service.impl.CreateClientService;
+import com.example.producer.service.messanging.event.ClientEvent;
 import com.example.producer.service.messanging.service.TopicSendService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,13 +15,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class Producer {
 
-    private final ObjectMapper objectMapper;
     private final CreateClientService clientService;
     private final TopicSendService topicSendService;
+    private final ModelMapper modelMapper;
 
-    public String sendMessage(Client client) throws JsonProcessingException {
-       // String clientAsMessage = objectMapper.writeValueAsString(client);
-        topicSendService.clientCreatedFromUI(client);
+    public String sendMessage(Client client) {
+        topicSendService.clientCreatedFromUI(modelMapper.map(client, ClientEvent.class));
 
         log.info("Client produced {}", client);
 
@@ -33,11 +29,10 @@ public class Producer {
 
 
     @Scheduled(fixedRate = 30000)
-    public void sendMessageOnScheduled() throws JsonProcessingException {
+    public void sendMessageOnScheduled() {
 
-        //String clientAsMessage = objectMapper.writeValueAsString(clientService.createClient());
         Client client = clientService.createClient();
-        topicSendService.clientCreatedFromScheduler(client);
+        topicSendService.clientCreatedFromScheduler(modelMapper.map(client, ClientEvent.class));
 
         log.info("Client produced {}", client);
 
