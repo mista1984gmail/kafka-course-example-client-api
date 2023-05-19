@@ -2,6 +2,7 @@ package com.example.producer.service.producer;
 
 import com.example.producer.domain.Client;
 import com.example.producer.service.impl.CreateClientService;
+import com.example.producer.service.messanging.service.TopicSendService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -17,22 +18,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class Producer {
 
-    @Value("${topic.create-client-scheduler}")
-    private String topicCreateClientScheduler;
-
-    @Value("${topic.create-client}")
-    private String topicCreateClient;
-
-
     private final ObjectMapper objectMapper;
     private final CreateClientService clientService;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final TopicSendService topicSendService;
 
     public String sendMessage(Client client) throws JsonProcessingException {
-        String clientAsMessage = objectMapper.writeValueAsString(client);
-        kafkaTemplate.send(topicCreateClient, clientAsMessage);
+       // String clientAsMessage = objectMapper.writeValueAsString(client);
+        topicSendService.clientCreatedFromUI(client);
 
-        log.info("Client produced {}", clientAsMessage);
+        log.info("Client produced {}", client);
 
         return "message sent";
     }
@@ -41,10 +35,11 @@ public class Producer {
     @Scheduled(fixedRate = 30000)
     public void sendMessageOnScheduled() throws JsonProcessingException {
 
-        String clientAsMessage = objectMapper.writeValueAsString(clientService.createClient());
-        kafkaTemplate.send(topicCreateClientScheduler, clientAsMessage);
+        //String clientAsMessage = objectMapper.writeValueAsString(clientService.createClient());
+        Client client = clientService.createClient();
+        topicSendService.clientCreatedFromScheduler(client);
 
-        log.info("Client produced {}", clientAsMessage);
+        log.info("Client produced {}", client);
 
     }
 

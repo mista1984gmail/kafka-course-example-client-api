@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 topic:
   create-client: create.client
@@ -7,3 +7,7 @@ topic:
 
 scheduler:
   client-creation-period: 30000
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:29092
